@@ -17,13 +17,18 @@ public class Client {
     }
   }
 
-  public void start(Scanner scanner) throws IOException {
+  public void start(Scanner scanner, String username) throws IOException {
+    sendUsername(username);
+
     String message;
 
-    sendMessage("Client has joined the Server");
+    String serverMessage = in.readLine();
 
+    System.out.println("Server: " + serverMessage);
+
+    System.out.print(username + ": ");
     while (scanner.hasNextLine()) {
-      System.out.print("Message: ");
+      System.out.print(username + ": ");
       message = scanner.nextLine();
       if ("exit".equalsIgnoreCase(message)) {
         sendMessage("Client is disconnecting...");
@@ -31,11 +36,13 @@ public class Client {
       }
       sendMessage(message);
     }
+
+    stop();
     scanner.close();
-    out.close();
   }
 
   public void stop() throws IOException {
+    out.close();
     clientSocket.close();
   }
 
@@ -45,8 +52,14 @@ public class Client {
     out.flush();
   }
 
+  private void sendUsername(String username) throws IOException {
+    out.write(username);
+    out.newLine();
+    out.flush();
+  }
+
   public static String userInput(Scanner scanner) {
-    System.out.println("Enter your username:");
+    System.out.print("Enter your username: ");
     String username = scanner.nextLine();
     return username;
   }
@@ -55,7 +68,7 @@ public class Client {
     Client client = new Client("127.0.0.1", 8000);
     Scanner scanner = new Scanner(System.in);
     String username = userInput(scanner);
-    client.start(scanner);
+    client.start(scanner, username);
     client.stop();
   }
 }

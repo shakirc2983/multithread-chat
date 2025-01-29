@@ -25,13 +25,16 @@ public class Server {
 
   public void start() throws IOException {
     System.out.println("Server socket connected with client socket");
-
     String message;
-    System.out.println(message = in.readLine());
+    String username = in.readLine(); // Should be the username I think
+    out.println("Welcome to the Server, " + username);
+    out.flush();
     while ((message = in.readLine()) != null) {
-      System.out.println("Client: " + message);
+      System.out.println(username + ": " + message);
     }
 
+    stop();
+    out.close();
     in.close();
   }
 
