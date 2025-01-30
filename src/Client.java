@@ -17,6 +17,9 @@ public class Client {
     }
   }
 
+  // TODO: Set up a listener thread which is created, it continues to loop,
+  // waiting if the Server wants to send a message.
+
   public void start(Scanner scanner, String username) throws IOException {
     sendUsername(username);
 
