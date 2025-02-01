@@ -4,9 +4,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 
 public class Server {
   private final ServerSocket serverSocket;
+  private List<PrintWriter> printWriters = new CopyOnWriteArrayList<>();
 
   public Server(int port) throws IOException {
     try {
@@ -14,7 +17,8 @@ public class Server {
       System.out.println("Server has started");
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        new Thread(new ClientHandler(clientSocket)).start();
+        ClientHandler handler = new ClientHandler(this, clientSocket);
+        new Thread(handler).start();
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -34,10 +38,21 @@ public class Server {
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
+    private Server server;
 
-    public ClientHandler(Socket clientSocket) {
+    public ClientHandler(Server server, Socket clientSocket) {
+      this.server = server;
       this.clientSocket = clientSocket;
 
+    }
+
+    public void sendMessageToClients(String fullMessage) {
+      for (PrintWriter writer : this.server.printWriters) {
+        PrintWriter sender = out;
+        if (writer != sender) {
+          writer.println(fullMessage);
+        }
+      }
     }
 
     @Override
@@ -46,14 +61,16 @@ public class Server {
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
+        server.printWriters.add(out);
         String message;
         String username = in.readLine();
 
-        out.println("Welcome to the Server, " + username);
-        out.flush();
+        sendMessageToClients("Welcome to the Server, " + username);
 
         while ((message = in.readLine()) != null) {
-          System.out.println(username + ": " + message);
+          String fullMessage = username + ": " + message;
+          System.out.println(fullMessage);
+          sendMessageToClients(fullMessage);
         }
 
       } catch (IOException e) {
@@ -61,6 +78,7 @@ public class Server {
       } finally {
         try {
           if (clientSocket != null && !clientSocket.isClosed()) {
+            server.printWriters.remove(out);
             out.println("Client has left the server");
             out.close();
             in.close();

@@ -17,21 +17,14 @@ public class Client {
     }
   }
 
-  // TODO: Set up a listener thread which is created, it continues to loop,
-  // waiting if the Server wants to send a message.
-
   public void start(Scanner scanner, String username) throws IOException {
     sendUsername(username);
 
+    Thread listenerThread = new Thread(new Listener());
+    listenerThread.start();
+
     String message;
-
-    String serverMessage = in.readLine();
-
-    System.out.println("Server: " + serverMessage);
-
-    System.out.print(username + ": ");
     while (scanner.hasNextLine()) {
-      System.out.print(username + ": ");
       message = scanner.nextLine();
       if ("exit".equalsIgnoreCase(message)) {
         sendMessage("Client is disconnecting...");
@@ -73,5 +66,21 @@ public class Client {
     String username = userInput(scanner);
     client.start(scanner, username);
     client.stop();
+  }
+
+  private class Listener implements Runnable {
+    @Override
+
+    public void run() {
+      try {
+        String serverMessage;
+        while ((serverMessage = in.readLine()) != null) {
+          System.out.println(serverMessage);
+        }
+      } catch (IOException e) {
+        System.err.println("Error listening to server" + e.getMessage());
+      }
+    }
+
   }
 }
