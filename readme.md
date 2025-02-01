@@ -2,6 +2,9 @@
 
 Simple chat application built in Java that uses socket programming and multi-threading. This app allows multiple users on the **same network** to communicate in real-time through a client-server architecture.
 
+## Preview
+![mulithread-preview](https://github.com/user-attachments/assets/130d8d6b-8fbf-46dc-bf9a-c2cbcbe9f5de)
+
 ## Features
 
 - Real-time Messaging: Send and receive messages instantly.
