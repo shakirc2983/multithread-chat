@@ -30,7 +30,7 @@ javac Server.java
 java Server
 ```
 
-To start a client, navigate o the project directory and run:
+To start a client, navigate to the project directory and run:
 ```bash
 javac Client.java
 java Client
